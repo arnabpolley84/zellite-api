@@ -54,5 +54,18 @@ router.post('/register', async (req, res) => {
         return res.status(500).json({ message: "Server error", error: error.message });
     }
 });
+// LIST USERS API
+router.get('/users', async (req, res) => {
+    try {
+        // Fetch all users (excluding hashed password for security)
+        const users = await User.find({}, { hashedPassword: 0 });
 
+        return res.status(200).json({
+            count: users.length,
+            users
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
 module.exports = router;
