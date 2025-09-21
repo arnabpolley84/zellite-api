@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Ad = require('../models/Ad');
 
 const router = express.Router();
 
@@ -66,6 +67,17 @@ router.get('/users', async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+// LIST ADS API
+router.get('/ads', async (req, res) => {
+    try {
+        const ads = await Ad.find({});
+        console.log("Fetched ads:", ads); // 👈 check what comes back
+        res.status(200).json({ count: ads.length, ads });
+    } catch (error) {
+        console.error("Error fetching ads:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 });
 module.exports = router;
