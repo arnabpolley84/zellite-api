@@ -72,9 +72,29 @@ router.get('/users', async (req, res) => {
 // LIST ADS API
 router.get('/ads', async (req, res) => {
     try {
-        const ads = await Ad.find({});
-        console.log("Fetched ads:", ads); // 👈 check what comes back
-        res.status(200).json({ count: ads.length, ads });
+        // Get page and limit from query params, default to page 1 and 10 items per page
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        // Calculate skip value
+        const skip = (page - 1) * limit;
+
+        // Fetch paginated ads
+        const ads = await Ad.find({})
+            .skip(skip)
+            .limit(limit);
+
+        // Get total count for pagination info
+        const total = await Ad.countDocuments();
+
+        return res.status(200).json({
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+            count: ads.length,
+            ads
+        });
     } catch (error) {
         console.error("Error fetching ads:", error);
         res.status(500).json({ message: "Server error", error: error.message });
